@@ -22,7 +22,9 @@ Everything in `[square brackets]` is a placeholder. Replace it with your own tex
 
 ## 1. Preview the site
 
-**Simplest:** double-click `index.html` to open it in your browser.
+**Important on Windows:** extract the ZIP first (right-click → *Extract All…*). Do not open `index.html` from inside the ZIP. Then open the `unique-web` folder and double-click `index.html`. See `START-HERE.txt` for pictures-free step-by-step help.
+
+**Simplest:** double-click `index.html` in the extracted folder to open it in your browser.
 
 **Or run a local server** (recommended, closest to the published site). Open a terminal in this folder and run:
 

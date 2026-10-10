@@ -1,0 +1,22 @@
+START HERE - how to open your website on Windows
+==================================================
+
+1. Do NOT open index.html from inside the ZIP file.
+   Right-click the ZIP file and choose "Extract All...", then click "Extract".
+
+2. Open the extracted folder called "unique-web".
+   You should see index.html, a folder called "assets", and this file.
+
+3. Double-click index.html.
+   It should open in your web browser (Chrome, Edge, or Firefox) and show the
+   black hero page with "[Your Full Name]" and the gold "View selected work" button.
+
+If you see plain text instead of the designed page (for example "Menu", "Close",
+or a line like "[Skip to content](https://...)"), the file is being shown as text.
+Do not open it in Notepad, a text viewer, or a markdown preview. Use the steps
+above and open it with your web browser.
+
+Your wallpapers are in the folder assets\wallpapers and are named phase-1.jpg to
+phase-8.jpg.
+
+To edit your text, open assets\js\content.js in Notepad. See README.md for more.
