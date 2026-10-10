@@ -74,11 +74,11 @@ window.SITE_CONTENT = {
           period: "Approx. 8–9 months",
           title: "Promoter",
           org: "D-Mart",
-          text: "Customer interaction and clear communication with shoppers."
+          text: "Customer interaction and communication."
         },
         {
-          period: "Current",
-          title: "First-year BCA learning journey",
+          period: "Current learning journey",
+          title: "First-year BCA student",
           org: "[Add college name]",
           text: "Learning C programming, SQL, HTML, CSS, and JavaScript through hands-on practice."
         }
@@ -121,7 +121,7 @@ window.SITE_CONTENT = {
       intro: "Projects and practice work. Live links will be added when they are ready.",
       projects: [
         {
-          title: "8-Phase Portfolio",
+          title: "8-Phase Cinematic Portfolio Website",
           category: "Web Development",
           status: "In Progress",
           summary: "An interactive portfolio combining custom wallpapers, cinematic visual storytelling, animations, and responsive design.",
@@ -129,15 +129,15 @@ window.SITE_CONTENT = {
         },
         {
           title: "SQL Student Database Practice",
-          category: "Database",
-          status: "Learning project",
+          category: "Database Learning Project",
+          status: "",
           summary: "Practice with student records, SQL table creation, inserting data, and queries.",
           link: ""
         },
         {
           title: "C Programming Practice Programs",
-          category: "Programming",
-          status: "Learning project",
+          category: "Programming Learning Project",
+          status: "",
           summary: "Practice programs created while learning C programming.",
           link: ""
         }
@@ -180,8 +180,8 @@ window.SITE_CONTENT = {
     name: "Contact",
     ghost: "END",
     anchor: "contact",
-    heading: "Let's Build Something Meaningful.",
-    intro: "I'm learning, experimenting, and working toward becoming a better developer.",
+    heading: "Let’s Build Something Meaningful.",
+    intro: "I’m learning, experimenting, and working toward becoming a better developer.",
     wallpaper: "assets/wallpapers/phase-1.jpg",
     focus: "50% 50%", tone: "dark", accent: "#37e6ff",
     fallback: ["#070706", "#2a2116"]
