@@ -189,7 +189,12 @@
     },
 
     skills(p) {
+      const allSkills = p.groups.flatMap((g) => g.items);
       return head(p) + `
+        <div class="skills-all" data-reveal ${delay(120)} aria-label="All skills">
+          <p class="skills-all-label">All skills</p>
+          <ul class="chips skills-all-list">${allSkills.map((s) => `<li class="chip">${esc(s)}</li>`).join("")}</ul>
+        </div>
         <div class="skills-explorer" data-reveal ${delay(160)}>
           <div class="skill-tabs" role="tablist" aria-label="Skill categories">
             ${p.groups.map((g, i) => `<button type="button" role="tab" class="skill-tab" id="skill-tab-${i}"

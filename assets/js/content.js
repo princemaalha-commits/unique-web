@@ -59,16 +59,15 @@ window.SITE_CONTENT = {
     {
       id: 2, type: "about", name: "About Me",
       heading: "About Me",
-      intro: "Curious about computers, programming, and practical technology.",
+      intro: "",
       paragraphs: [
-        "I am a first-year BCA student interested in computers, programming, and practical technology. I enjoy understanding how things work and improving my skills by building projects.",
-        "My goal is to become a skilled developer and build useful software projects."
+        "I am a first-year BCA student interested in computers, programming, and practical technology. I enjoy understanding how things work and improving my skills by building projects."
       ],
       facts: [
         { label: "Education", value: "First-year BCA student" },
         { label: "Languages", value: "Hindi, English, Gujarati" },
         { label: "Based in", value: "Surat, Gujarat, India" },
-        { label: "Career goal", value: "Skilled developer building useful software" }
+        { label: "Career goal", value: "Become a skilled developer and build useful software projects." }
       ],
       wallpaper: "assets/wallpapers/phase-2.jpg",
       focus: "70% 50%", tone: "dark", accent: "#5ef2ff",
@@ -89,7 +88,7 @@ window.SITE_CONTENT = {
           period: "Current learning journey",
           title: "First-year BCA student",
           org: "[Add college name]",
-          text: "Learning C programming, SQL, HTML, CSS, and JavaScript through hands-on practice."
+          text: "Current learning: C programming, SQL, and web development."
         }
       ],
       wallpaper: "assets/wallpapers/phase-3.jpg",

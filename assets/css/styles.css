@@ -1823,3 +1823,11 @@ html[data-phase-type="finale"] .hud { opacity: 0; }
 @media (prefers-reduced-motion: reduce) {
   .skill-tab, .filter-btn, .term-ctl, .term-chip { transition: none; }
 }
+
+/* All skills listed at once (the tabs below show each group in detail) */
+.skills-all { margin: 0 0 28px; }
+.skills-all-label {
+  font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); margin: 0 0 12px;
+}
+.skills-all-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px; }
