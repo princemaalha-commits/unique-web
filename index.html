@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="description" content="Personal portfolio — edit assets/js/content.js to make it yours." />
+  <meta name="theme-color" content="#050506" />
+  <title>Personal Portfolio</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" />
+  <link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#phase-2">Skip to content</a>
+
+  <!-- Fixed wallpaper layers (filled by main.js) -->
+  <div class="stage" id="stage" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="phase-flash" id="flash" aria-hidden="true"></div>
+
+  <div class="progress" aria-hidden="true"></div>
+
+  <header class="site-header" id="header">
+    <a class="brand" id="brand" href="#phase-1"></a>
+    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
+  </header>
+
+  <nav class="dots" aria-label="Phases">
+    <ol id="dots"></ol>
+  </nav>
+
+  <div class="hud" aria-hidden="true">
+    <span class="hud-num" id="hudNum">01 / 08</span>
+    <span class="hud-name" id="hudName">Opening</span>
+  </div>
+
+  <div class="menu" id="menu" role="dialog" aria-modal="true" aria-label="Site sections">
+    <button class="menu-close" id="menuClose" type="button">Close</button>
+    <nav aria-label="Phases">
+      <ol id="menuList"></ol>
+    </nav>
+  </div>
+
+  <main id="main">
+    <div id="app"></div>
+  </main>
+
+  <noscript>
+    <p class="noscript">This portfolio needs JavaScript to display its phases.</p>
+  </noscript>
+
+  <script src="assets/js/content.js"></script>
+  <script src="assets/js/main.js"></script>
+</body>
+</html>

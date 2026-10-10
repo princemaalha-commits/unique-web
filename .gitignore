@@ -1,0 +1,15 @@
+# Original, uncompressed wallpapers (large). The optimised phase-N.jpg files are published instead.
+assets/wallpapers/originals/*
+!assets/wallpapers/originals/.gitkeep
+
+# Python / tooling
+__pycache__/
+*.pyc
+.venv/
+node_modules/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
