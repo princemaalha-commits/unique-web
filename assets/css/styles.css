@@ -214,6 +214,35 @@ p { margin: 0; }
   100% { opacity: 0; }
 }
 
+/* Thin accent scan line that sweeps across the wallpaper between phases (transform only, cheap) */
+.phase-scan {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 26vh;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(0, -100%, 0);
+  background: linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--accent) 14%, transparent) 72%, color-mix(in srgb, var(--accent) 38%, transparent) 100%);
+}
+.phase-scan.go { animation: scan-down 1.1s var(--ease-cine) both; }
+.phase-scan.go.up {
+  animation-name: scan-up;
+  background: linear-gradient(0deg, transparent 0%, color-mix(in srgb, var(--accent) 14%, transparent) 72%, color-mix(in srgb, var(--accent) 38%, transparent) 100%);
+}
+@keyframes scan-down {
+  0% { transform: translate3d(0, -100%, 0); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate3d(0, 420%, 0); opacity: 0; }
+}
+@keyframes scan-up {
+  0% { transform: translate3d(0, 420%, 0); opacity: 0; }
+  15% { opacity: 1; }
+  100% { transform: translate3d(0, -100%, 0); opacity: 0; }
+}
+
 /* Cursor glow (desktop only, added by JavaScript) */
 .cursor-glow {
   position: fixed;
@@ -1179,4 +1208,313 @@ html[data-phase-type="finale"] .hud { opacity: 0; }
 @media (max-width: 760px) {
   .about-grid.has-photo { grid-template-columns: 1fr; }
   .photo-frame { width: 180px; }
+}
+
+/* =====================================================================
+   FEATURES — interactive terminal, SQL demo, project details dialog
+   ===================================================================== */
+
+/* Terminal */
+.terminal {
+  margin-top: clamp(28px, 5vh, 48px);
+  max-width: 880px;
+  padding: 0;
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: 0 0 36px -16px color-mix(in srgb, var(--accent) 60%, transparent);
+  background: rgba(3, 6, 10, 0.78);
+}
+.term-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.term-dots { display: inline-flex; gap: 6px; }
+.term-dots i {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 55%, #000);
+  opacity: 0.8;
+}
+.term-dots i:nth-child(2) { background: var(--violet); }
+.term-dots i:nth-child(3) { background: rgba(255, 255, 255, 0.35); }
+.term-title {
+  margin: 0;
+  font: 500 0.78rem var(--font-body);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.term-intro {
+  padding: 12px 18px 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.term-out {
+  height: min(340px, 52vh);
+  overflow-y: auto;
+  padding: 12px 18px;
+  font: 0.9rem/1.6 ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+  color: #cdfaff;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  scrollbar-width: thin;
+}
+.term-out:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.term-line { min-height: 1.6em; }
+.term-echo { color: #ffffff; }
+.term-echo-prompt { color: var(--accent); }
+.term-err { color: #ff9ab8; }
+.term-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font: 0.95rem ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+}
+.term-prompt {
+  color: var(--accent);
+  white-space: nowrap;
+  flex: 0 1 auto;
+  max-width: 45%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.term-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #ffffff;
+  font: inherit;
+  font-size: 16px; /* 16px stops iPhones zooming in on focus */
+}
+.term-input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* SQL demo */
+.sql-demo {
+  margin-top: clamp(40px, 8vh, 72px);
+  max-width: 980px;
+}
+.sql-title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  color: var(--fg);
+}
+.sql-intro { color: var(--muted); font-size: 0.95rem; max-width: 62ch; }
+.sql-steps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0 12px;
+}
+.sql-step {
+  min-height: 44px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--fg);
+  font: 500 0.78rem var(--font-body);
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.4s;
+}
+.sql-step:hover {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  box-shadow: 0 0 18px -6px var(--accent);
+}
+.sql-reset { border-color: rgba(255, 255, 255, 0.25); }
+.sql-note { font-size: 0.88rem; color: var(--muted); min-height: 1.5em; }
+.sql-label {
+  display: block;
+  margin: 14px 0 6px;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.sql-input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 150px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+  background: rgba(3, 6, 10, 0.8);
+  color: #cdfaff;
+  font: 0.92rem/1.55 ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+  font-size: 16px;
+  resize: vertical;
+}
+.sql-input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sql-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  margin-top: 12px;
+}
+.sql-actions .btn { cursor: pointer; font: inherit; }
+.sql-actions .btn:disabled { opacity: 0.6; cursor: wait; }
+.sql-status { font-size: 0.85rem; color: var(--muted); margin: 0; }
+.sql-status.is-error { color: #ff9ab8; }
+.sql-out { margin-top: 16px; }
+.sql-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid var(--panel-edge);
+  background: rgba(3, 6, 10, 0.6);
+  -webkit-overflow-scrolling: touch;
+}
+.sql-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  color: var(--fg);
+}
+.sql-table caption {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.sql-table th,
+.sql-table td {
+  padding: 9px 14px;
+  text-align: left;
+  white-space: nowrap;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+.sql-table th { color: var(--accent); font-weight: 500; }
+.sql-more { padding: 10px 14px; font-size: 0.82rem; color: var(--muted); }
+
+/* Project details button and actions row */
+.project-actions {
+  margin-top: auto;
+  padding-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 22px;
+}
+.project-actions .project-link { margin-top: 0; padding-top: 0; }
+.project-open {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--fg);
+  font: inherit;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.project-open::after {
+  content: "+";
+  color: var(--accent);
+  transition: transform 0.5s var(--ease);
+}
+.project-open:hover::after { transform: rotate(90deg); }
+
+/* Project details dialog */
+.detail-dialog {
+  width: min(640px, calc(100vw - 32px));
+  max-height: 86vh;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 20px;
+  background: rgba(8, 9, 12, 0.96);
+  color: #f5f0e8;
+  box-shadow: 0 0 60px -18px color-mix(in srgb, var(--accent) 55%, transparent);
+  overflow: auto;
+}
+.detail-dialog::backdrop { background: rgba(0, 0, 0, 0.72); }
+.detail-inner { padding: clamp(22px, 4vw, 34px); }
+.detail-inner .tag {
+  font-size: 0.7rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 8px;
+}
+.detail-inner h3 {
+  margin: 0 0 12px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.6rem, 4vw, 2.1rem);
+  line-height: 1.15;
+}
+.detail-summary { color: rgba(245, 240, 232, 0.86); margin-bottom: 18px; }
+.detail-inner h4 {
+  margin: 20px 0 8px;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--violet);
+  font-weight: 500;
+}
+.detail-list { margin: 0; padding-left: 20px; color: rgba(245, 240, 232, 0.86); }
+.detail-list li { margin: 6px 0; }
+.detail-empty, .detail-help { color: rgba(245, 240, 232, 0.7); font-size: 0.92rem; margin: 6px 0; }
+.detail-link {
+  display: inline-block;
+  margin: 6px 16px 6px 0;
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  padding-bottom: 2px;
+  min-height: 44px;
+  line-height: 44px;
+}
+.detail-link:hover { border-bottom-color: var(--accent); }
+.detail-close {
+  float: right;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: #f5f0e8;
+  font: inherit;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.detail-close:hover { border-color: var(--accent); color: var(--accent); }
+.detail-dialog :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* Responsive tuning for the new blocks */
+@media (max-width: 760px) {
+  /* On phones the prompt sits on its own line and the input takes the full width */
+  .term-form { flex-wrap: wrap; gap: 6px 10px; }
+  .term-prompt { max-width: 100%; }
+  .term-input { flex-basis: 100%; width: 100%; }
+  .sql-steps .sql-step { flex: 1 1 calc(50% - 10px); }
+  .sql-actions .btn { width: 100%; justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .phase-scan { display: none; }
+  .project-open::after { transition: none; }
 }

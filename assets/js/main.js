@@ -58,6 +58,45 @@
     label: p.type === "finale" ? "Contact" : p.name
   }));
 
+  /* ---------- Feature builders: terminal, SQL demo ---------- */
+  function renderTerminal(t) {
+    return `
+      <section class="terminal glass" data-reveal ${delay(160)} aria-labelledby="term-title">
+        <header class="term-bar">
+          <span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <h3 id="term-title" class="term-title">${esc(t.title)}</h3>
+        </header>
+        <p class="term-intro" id="term-help">${esc(t.intro)}</p>
+        <div class="term-out" id="termOut" role="log" aria-live="polite" aria-label="Terminal output" tabindex="0"></div>
+        <form class="term-form" id="termForm" autocomplete="off">
+          <label class="term-prompt" for="termIn">${esc(t.prompt)}</label>
+          <input id="termIn" class="term-input" type="text" name="command"
+                 autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+                 aria-describedby="term-help" />
+        </form>
+      </section>`;
+  }
+
+  function renderSqlDemo(d) {
+    return `
+      <section id="${esc(d.id)}" class="sql-demo glass" data-reveal ${delay(120)} aria-labelledby="sql-title">
+        <h3 id="sql-title" class="sql-title">${esc(d.title)}</h3>
+        <p class="sql-intro">${esc(d.intro)}</p>
+        <div class="sql-steps" role="group" aria-label="Example steps">
+          ${d.steps.map((st, i) => `<button type="button" class="sql-step" data-step="${i}">${esc(st.label)}</button>`).join("")}
+          <button type="button" class="sql-step sql-reset" data-reset="1">${esc(d.resetLabel || "Reset database")}</button>
+        </div>
+        <p class="sql-note" id="sqlNote" aria-live="polite">Pick a step to load its SQL, then run it. Or write your own query below.</p>
+        <label class="sql-label" for="sqlIn">SQL query</label>
+        <textarea id="sqlIn" class="sql-input" rows="7" spellcheck="false">${esc(d.start)}</textarea>
+        <div class="sql-actions">
+          <button type="button" class="btn btn-solid" id="sqlRun"><span>Run query</span><span class="arrow" aria-hidden="true">→</span></button>
+          <p class="sql-status" id="sqlStatus" role="status">Tip: press Ctrl+Enter (Cmd+Enter on Mac) to run.</p>
+        </div>
+        <div class="sql-out" id="sqlOut"></div>
+      </section>`;
+  }
+
   /* ---------- Renderers (one per phase type) ---------- */
   const head = (p) => `
     <header class="phase-head">
@@ -148,7 +187,8 @@
                 </div>
               </article>
             </div>`).join("")}
-        </div>`;
+        </div>
+        ${p.terminal ? renderTerminal(p.terminal) : ""}`;
     },
 
     work(p) {
@@ -160,12 +200,17 @@
                 <p class="tag">${esc(pr.category)}${pr.year ? ` · ${esc(pr.year)}` : ""}${pr.status ? ` · <span class="status">${esc(pr.status)}</span>` : ""}</p>
                 <h3>${esc(pr.title)}</h3>
                 <p>${esc(pr.summary)}</p>
-                ${isLiveUrl(pr.link) && pr.link.startsWith("http")
-                  ? `<a class="project-link" href="${esc(pr.link)}" target="_blank" rel="noopener noreferrer">View project</a>`
-                  : `<span class="project-link is-disabled" aria-disabled="true">Live link not available yet</span>`}
+                <div class="project-actions">
+                  <button type="button" class="project-open" data-project="${i}" aria-haspopup="dialog"
+                          aria-label="Project details: ${esc(pr.title)}">Project details</button>
+                  ${isLiveUrl(pr.link) && pr.link.startsWith("http")
+                    ? `<a class="project-link" href="${esc(pr.link)}" target="_blank" rel="noopener noreferrer">View project</a>`
+                    : `<span class="project-link is-disabled" aria-disabled="true">Live link not available yet</span>`}
+                </div>
               </article>
             </div>`).join("")}
-        </div>`;
+        </div>
+        ${p.sqlDemo ? renderSqlDemo(p.sqlDemo) : ""}`;
     },
 
     approach(p) {
@@ -296,6 +341,7 @@
   const hudNum = $("#hudNum");
   const hudName = $("#hudName");
   const flash = $("#flash");
+  const scan = $("#scan");
   const header = $("#header");
   const dotLinks = $$("a", dotsEl);
   const menuLinks = $$("a", menuList);
@@ -305,6 +351,7 @@
 
   function setActive(i, dir) {
     if (i === active) return;
+    const isFirst = active === -1;
 
     const prev = layers[active];
     if (prev) {
@@ -342,6 +389,15 @@
       flash.classList.remove("go");
       void flash.offsetWidth; // restart the animation
       flash.classList.add("go");
+
+      // A thin accent scan line sweeps across the wallpaper between phases.
+      // It moves down when scrolling down and up when scrolling up.
+      if (scan && !isFirst) {
+        scan.classList.remove("go", "up");
+        void scan.offsetWidth;
+        scan.classList.add("go");
+        if (dir === "up") scan.classList.add("up");
+      }
     }
   }
 
@@ -520,6 +576,341 @@
     });
   }
 
+  /* ---------- Interactive terminal ---------- */
+  function setupTerminal() {
+    const cfg = (phases.find((p) => p.terminal) || {}).terminal;
+    const out = $("#termOut");
+    const form = $("#termForm");
+    const input = $("#termIn");
+    if (!cfg || !out || !form || !input) return;
+
+    const aboutPhase = phases.find((p) => p.type === "about") || {};
+    const skillsPhase = phases.find((p) => p.type === "skills") || {};
+    const workPhase = phases.find((p) => p.type === "work") || {};
+    const facts = {};
+    (aboutPhase.facts || []).forEach((f) => { facts[f.label.toLowerCase()] = f.value; });
+    const fact = (label) => facts[label] || "Not added yet.";
+
+    const helpText = {
+      about: "who I am",
+      skills: "what I am learning",
+      projects: "my projects and their status",
+      education: "my studies",
+      languages: "languages I speak",
+      goal: "what I am working toward",
+      location: "where I am based",
+      contact: "how to reach me",
+      sql: "open the SQL demo",
+      c: "a sample C program",
+      whoami: "a short summary",
+      clear: "clear the screen"
+    };
+
+    const print = (text, cls = "") => {
+      const line = document.createElement("div");
+      line.className = `term-line ${cls}`.trim();
+      line.textContent = text === "" ? "\u00a0" : text;
+      out.appendChild(line);
+    };
+    const printLines = (lines, cls) => lines.forEach((l) => print(l, cls));
+    const echo = (cmd) => {
+      const line = document.createElement("div");
+      line.className = "term-line term-echo";
+      const pr = document.createElement("span");
+      pr.className = "term-echo-prompt";
+      pr.textContent = `${cfg.prompt} `;
+      const c = document.createElement("span");
+      c.textContent = cmd;
+      line.append(pr, c);
+      out.appendChild(line);
+    };
+
+    const openSql = () => {
+      const target = document.getElementById("sql-demo");
+      if (!target) return ["The SQL demo is not on this page yet."];
+      target.scrollIntoView({ behavior: prefersReduced() ? "auto" : "smooth", block: "start" });
+      return ["Opening the SQL demo in Selected Projects."];
+    };
+
+    // Each command returns a list of text lines. Text is added with textContent, never as HTML.
+    const commands = {
+      help: () => [
+        "Available commands:",
+        ...Object.entries(helpText).map(([k, v]) => `  ${k.padEnd(10)} ${v}`),
+        "",
+        "Use the up and down arrow keys to see earlier commands."
+      ],
+      about: () => [owner.tagline || "", "", ...(aboutPhase.paragraphs || [])],
+      skills: () => (skillsPhase.groups || []).map((g) => `${g.title}: ${g.items.join(", ")}`),
+      projects: () => (workPhase.projects || []).map((pr) =>
+        `- ${pr.title} (${pr.category}${pr.status ? `, ${pr.status}` : ""})`),
+      education: () => [fact("education")],
+      languages: () => [fact("languages")],
+      goal: () => [fact("career goal")],
+      location: () => [owner.location || "Not added yet."],
+      contact: () => [
+        `Email: ${owner.email || "not added yet"}`,
+        `Phone: ${owner.phone || "not added yet"}`,
+        ...(owner.social || []).map((s) => `${s.label}: ${isLiveUrl(s.url) ? s.url : "link to be added"}`)
+      ],
+      whoami: () => [`${owner.name} — ${owner.role}`],
+      sql: openSql,
+      c: () => [...cfg.sampleC, "", "(A general example. It is not one of my projects.)"]
+    };
+
+    const hist = [];
+    let histIndex = -1;
+
+    const run = (raw) => {
+      const cmd = raw.trim().toLowerCase();
+      if (!cmd) return;
+      echo(raw.trim());
+      if (cmd === "clear") {
+        out.innerHTML = "";
+      } else if (commands[cmd]) {
+        printLines(commands[cmd]());
+      } else {
+        print(`Command not found: ${cmd}. Type help to see the list.`, "term-err");
+      }
+      out.scrollTop = out.scrollHeight;
+    };
+
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowUp") {
+        if (!hist.length) return;
+        e.preventDefault();
+        histIndex = histIndex < 0 ? hist.length - 1 : Math.max(0, histIndex - 1);
+        input.value = hist[histIndex];
+      } else if (e.key === "ArrowDown") {
+        if (histIndex < 0) return;
+        e.preventDefault();
+        histIndex += 1;
+        if (histIndex >= hist.length) { histIndex = -1; input.value = ""; }
+        else input.value = hist[histIndex];
+      }
+    });
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const value = input.value;
+      if (value.trim()) hist.push(value.trim());
+      histIndex = -1;
+      run(value);
+      input.value = "";
+    });
+
+    printLines([
+      "Welcome. This is a small command line about me.",
+      "Type help to see what you can ask."
+    ]);
+  }
+
+  /* ---------- SQL demo (real SQLite, loaded only when first used) ---------- */
+  function setupSqlDemo() {
+    const cfg = (phases.find((p) => p.sqlDemo) || {}).sqlDemo;
+    const wrap = cfg && document.getElementById(cfg.id);
+    if (!cfg || !wrap) return;
+
+    const input = $("#sqlIn");
+    const out = $("#sqlOut");
+    const status = $("#sqlStatus");
+    const note = $("#sqlNote");
+    const runBtn = $("#sqlRun");
+
+    let db = null;
+    let engine = null;
+
+    // The engine file is about 1.4 MB, so it is downloaded only when someone runs a query.
+    function loadEngine() {
+      if (db) return Promise.resolve(db);
+      if (!engine) {
+        engine = new Promise((resolve, reject) => {
+          const ready = () => (typeof window.initSqlJs === "function"
+            ? resolve(window.initSqlJs)
+            : reject(new Error("The SQL engine did not start.")));
+          if (typeof window.initSqlJs === "function") return ready();
+          const script = document.createElement("script");
+          script.src = "assets/vendor/sql.js/sql-asm.js";
+          script.async = true;
+          script.onload = ready;
+          script.onerror = () => reject(new Error("Could not load assets/vendor/sql.js/sql-asm.js."));
+          document.head.appendChild(script);
+        })
+          .then((init) => init())
+          .then((SQL) => { db = new SQL.Database(); return db; })
+          .catch((err) => { engine = null; throw err; });
+      }
+      return engine;
+    }
+
+    const setStatus = (msg, isError = false) => {
+      status.textContent = msg;
+      status.classList.toggle("is-error", isError);
+    };
+
+    function buildTable(r) {
+      const wrap2 = document.createElement("div");
+      wrap2.className = "sql-table-wrap";
+      const table = document.createElement("table");
+      table.className = "sql-table";
+      const caption = document.createElement("caption");
+      caption.textContent = `${r.values.length} row(s)`;
+      table.appendChild(caption);
+      const thead = document.createElement("thead");
+      const headRow = document.createElement("tr");
+      r.columns.forEach((c) => {
+        const th = document.createElement("th");
+        th.scope = "col";
+        th.textContent = c;
+        headRow.appendChild(th);
+      });
+      thead.appendChild(headRow);
+      table.appendChild(thead);
+      const tbody = document.createElement("tbody");
+      r.values.slice(0, 100).forEach((vals) => {
+        const row = document.createElement("tr");
+        vals.forEach((v) => {
+          const td = document.createElement("td");
+          td.textContent = v === null ? "NULL" : String(v);
+          row.appendChild(td);
+        });
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+      wrap2.appendChild(table);
+      if (r.values.length > 100) {
+        const more = document.createElement("p");
+        more.className = "sql-more";
+        more.textContent = `Showing the first 100 of ${r.values.length} rows.`;
+        wrap2.appendChild(more);
+      }
+      return wrap2;
+    }
+
+    async function runSql(sql) {
+      const text = String(sql || "").trim();
+      if (!text) { setStatus("Type a query first.", true); return; }
+      out.innerHTML = "";
+      runBtn.disabled = true;
+      setStatus(db ? "Running…" : "Loading the SQL engine (once, about 1.4 MB)…");
+      try {
+        const database = await loadEngine();
+        const t0 = performance.now();
+        const results = database.exec(text);
+        const ms = Math.round(performance.now() - t0);
+        if (!results.length) {
+          setStatus(`Done. ${database.getRowsModified()} row(s) changed (${ms} ms).`);
+        } else {
+          results.forEach((r) => out.appendChild(buildTable(r)));
+          setStatus(`Done. ${results.length} result table(s) in ${ms} ms.`);
+        }
+      } catch (err) {
+        const msg = (err && err.message) ? err.message : String(err);
+        const hint = /no such table/i.test(msg) ? " Tip: run steps 1 and 2 first." : "";
+        setStatus(`Error: ${msg}.${hint}`, true);
+      } finally {
+        runBtn.disabled = false;
+      }
+    }
+
+    wrap.addEventListener("click", (e) => {
+      const stepBtn = e.target.closest("[data-step]");
+      if (stepBtn) {
+        const st = cfg.steps[Number(stepBtn.dataset.step)];
+        if (!st) return;
+        input.value = st.sql;
+        note.textContent = `${st.label}: ${st.note}`;
+        runSql(st.sql);
+        return;
+      }
+      if (e.target.closest("[data-reset]")) {
+        input.value = cfg.resetSql;
+        note.textContent = "Database reset. Start again with step 1.";
+        runSql(cfg.resetSql);
+      }
+    });
+
+    runBtn.addEventListener("click", () => {
+      note.textContent = "Edit the SQL above and run it, or pick a step.";
+      runSql(input.value);
+    });
+
+    input.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+        e.preventDefault();
+        runSql(input.value);
+      }
+    });
+  }
+
+  /* ---------- Project details dialog ---------- */
+  function setupDetails() {
+    const projects = (phases.find((p) => p.type === "work") || {}).projects || [];
+    const dlg = document.createElement("dialog");
+    dlg.className = "detail-dialog";
+    dlg.setAttribute("aria-labelledby", "detail-title");
+    body.appendChild(dlg);
+
+    let opener = null;
+    const liveHttp = (u) => isLiveUrl(u) && /^https?:\/\//.test(u);
+
+    function fill(pr) {
+      const details = (pr.details || []).length
+        ? `<ul class="detail-list">${pr.details.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>`
+        : `<p class="detail-empty">Details will be added when this project is ready.</p>`;
+      const repo = liveHttp(pr.repo)
+        ? `<a class="detail-link" href="${esc(pr.repo)}" target="_blank" rel="noopener noreferrer">Open the GitHub repository ↗</a>
+           <p class="detail-help">Check the README, the code, and the commit history to see the work for yourself.</p>`
+        : `<p class="detail-empty">GitHub repository: link not available yet. It will appear here once the repository is ready.</p>`;
+      const live = liveHttp(pr.link)
+        ? `<a class="detail-link" href="${esc(pr.link)}" target="_blank" rel="noopener noreferrer">Open the live project ↗</a>`
+        : `<p class="detail-empty">Live project: not available yet.</p>`;
+      const demo = pr.demo
+        ? `<a class="detail-link" href="#${esc(pr.demo)}">${esc(pr.demoLabel || "Open the demo")} ↓</a>`
+        : "";
+      dlg.innerHTML = `
+        <div class="detail-inner">
+          <button type="button" class="detail-close">Close</button>
+          <p class="tag">${esc(pr.category)}${pr.status ? ` · ${esc(pr.status)}` : ""}</p>
+          <h3 id="detail-title">${esc(pr.title)}</h3>
+          <p class="detail-summary">${esc(pr.summary)}</p>
+          <h4>Details</h4>
+          ${details}
+          <h4>Work and links</h4>
+          ${repo}
+          ${live}
+          ${demo}
+        </div>`;
+    }
+
+    function closeDialog() {
+      if (typeof dlg.close === "function") dlg.close();
+      else dlg.removeAttribute("open");
+    }
+
+    appEl.addEventListener("click", (e) => {
+      const btn = e.target.closest(".project-open");
+      if (!btn) return;
+      const pr = projects[Number(btn.dataset.project)];
+      if (!pr) return;
+      opener = btn;
+      fill(pr);
+      if (typeof dlg.showModal === "function") dlg.showModal();
+      else dlg.setAttribute("open", "");
+      const closeBtn = dlg.querySelector(".detail-close");
+      if (closeBtn) closeBtn.focus();
+    });
+
+    dlg.addEventListener("click", (e) => {
+      // A click on the dark backdrop (outside the panel) or the Close button closes the dialog
+      if (e.target === dlg || e.target.closest(".detail-close") || e.target.closest("a")) closeDialog();
+    });
+    dlg.addEventListener("close", () => {
+      if (opener && document.body.contains(opener)) opener.focus();
+      opener = null;
+    });
+  }
+
   /* ---------- Start ---------- */
   buildOk();
 
@@ -527,6 +918,9 @@
     setupReveal();
     setupPointer();
     setupMenu();
+    setupTerminal();
+    setupSqlDemo();
+    setupDetails();
 
     const yearEl = $("#year");
     if (yearEl) yearEl.textContent = new Date().getFullYear();

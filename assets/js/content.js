@@ -11,6 +11,15 @@
    - CV: leave cvUrl empty to hide the CV button. Add a path such as
      "assets/cv.pdf" once you have a PDF.
    - Keep the text inside the quotation marks. Do not delete commas.
+
+   NEW OPTIONAL FEATURES (you can leave any of them as they are):
+   - terminal (Skills phase): the interactive command line. Its answers
+     are built from the text in this file.
+   - sqlDemo (Selected Projects phase): the SQL practice box. Its sample
+     rows are made-up practice data, not real people.
+   - Each project can have: repo (GitHub address), details (a list of
+     facts), demo (the id of a section on the page), demoLabel (button text).
+     Leave any of them as "" or [] until the real information is ready.
    ===================================================================== */
 window.SITE_CONTENT = {
 
@@ -104,6 +113,19 @@ window.SITE_CONTENT = {
       id: 5, type: "skills", name: "Skills",
       heading: "Skills & Tools",
       intro: "Areas I am learning and practising.",
+      terminal: {
+        title: "Interactive terminal",
+        intro: "A small command line about me. Click the box below and type help.",
+        prompt: "guest@portfolio:~$",
+        sampleC: [
+          "#include <stdio.h>",
+          "",
+          "int main(void) {",
+          "    printf(\"Hello, World!\\n\");",
+          "    return 0;",
+          "}"
+        ]
+      },
       groups: [
         { title: "Programming", items: ["C Programming"] },
         { title: "Web Development", items: ["HTML", "CSS", "JavaScript"] },
@@ -125,23 +147,77 @@ window.SITE_CONTENT = {
           category: "Web Development",
           status: "In Progress",
           summary: "An interactive portfolio combining custom wallpapers, cinematic visual storytelling, animations, and responsive design.",
-          link: ""
+          link: "",
+          repo: "",
+          details: [
+            "Built with plain HTML, CSS, and JavaScript, with no build tools.",
+            "Eight wallpapers, scroll-linked phase transitions, and a responsive layout."
+          ]
         },
         {
           title: "SQL Student Database Practice",
           category: "Database Learning Project",
           status: "",
           summary: "Practice with student records, SQL table creation, inserting data, and queries.",
-          link: ""
+          link: "",
+          repo: "",
+          demo: "sql-demo",
+          demoLabel: "Open the SQL demo",
+          details: [
+            "Practice SQL: create a table, insert rows, filter, sort, and group.",
+            "The demo runs in your browser on made-up sample data."
+          ]
         },
         {
           title: "C Programming Practice Programs",
           category: "Programming Learning Project",
           status: "",
           summary: "Practice programs created while learning C programming.",
-          link: ""
+          link: "",
+          repo: "",
+          details: []
         }
       ],
+      sqlDemo: {
+        id: "sql-demo",
+        title: "Try SQL in your browser",
+        intro: "A real SQLite database runs inside this page. The student rows are made-up practice data, not real people. Pick a step to load its SQL, or write your own query.",
+        resetLabel: "Reset database",
+        resetSql: "DROP TABLE IF EXISTS students;",
+        start: "-- Pick a step above, or write your own SQL here.\nSELECT 1 + 1 AS two;",
+        steps: [
+          {
+            label: "1 · Create table",
+            note: "CREATE TABLE defines the columns and their data types.",
+            sql: "CREATE TABLE IF NOT EXISTS students (\n  id INTEGER PRIMARY KEY,\n  name TEXT NOT NULL,\n  course TEXT,\n  city TEXT,\n  marks INTEGER\n);"
+          },
+          {
+            label: "2 · Insert rows",
+            note: "INSERT adds rows. Each row gets one value per column.",
+            sql: "INSERT OR REPLACE INTO students (id, name, course, city, marks) VALUES\n  (1, 'Student A', 'BCA', 'Surat', 78),\n  (2, 'Student B', 'BCA', 'Vadodara', 64),\n  (3, 'Student C', 'BCom', 'Surat', 71),\n  (4, 'Student D', 'BSc', 'Ahmedabad', 88),\n  (5, 'Student E', 'BCA', 'Surat', 52),\n  (6, 'Student F', 'BCom', 'Rajkot', 69);"
+          },
+          {
+            label: "3 · Select all",
+            note: "SELECT reads columns from the table. The * means every column.",
+            sql: "SELECT * FROM students;"
+          },
+          {
+            label: "4 · Filter",
+            note: "WHERE keeps only the rows that match a condition.",
+            sql: "SELECT name, marks FROM students WHERE marks >= 70;"
+          },
+          {
+            label: "5 · Sort",
+            note: "ORDER BY sorts the result. DESC means highest first.",
+            sql: "SELECT name, marks FROM students ORDER BY marks DESC;"
+          },
+          {
+            label: "6 · Group",
+            note: "GROUP BY combines rows, and COUNT and AVG summarise each group.",
+            sql: "SELECT course, COUNT(*) AS students, ROUND(AVG(marks), 1) AS avg_marks\nFROM students\nGROUP BY course;"
+          }
+        ]
+      },
       wallpaper: "assets/wallpapers/phase-6.jpg",
       focus: "65% 50%", tone: "dark", accent: "#b07bff",
       fallback: ["#150506", "#5c2427"]

@@ -54,6 +54,12 @@ Open `assets/js/content.js` in any text editor. Change text inside the quotation
 
 ---
 
+## 3b. Optional features (edit in content.js)
+
+- **Interactive terminal** (Skills phase): the `terminal` block. Its answers come from the text in `content.js`. Type `help` on the page to see the commands.
+- **SQL demo** (Selected Projects phase): the `sqlDemo` block. It runs a real SQLite database in the browser. The student rows are made-up practice data. The engine file is `assets/vendor/sql.js/sql-asm.js` (MIT licence, see `LICENSE.txt` in that folder). It loads only when someone runs a query.
+- **Project details**: each project can have `repo` (your GitHub repository link), `details` (a list of facts), `demo` and `demoLabel`. Leave any of them empty until the real information is ready. Empty links show "not available yet", and no link is invented.
+
 ## 4. Save your changes (Git and GitHub)
 
 The project lives in the GitHub repository `princemaalha-commits/unique-web`.
