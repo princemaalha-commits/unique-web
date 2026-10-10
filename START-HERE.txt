@@ -1,22 +1,37 @@
 START HERE - how to open your website on Windows
 ==================================================
 
-1. Do NOT open index.html from inside the ZIP file.
-   Right-click the ZIP file and choose "Extract All...", then click "Extract".
+STEP 1 - Extract the ZIP (required)
+  Right-click the downloaded ZIP file (unique-web-portfolio.zip).
+  Choose "Extract All...", then click "Extract".
+  Do NOT double-click index.html while it is still inside the ZIP.
 
-2. Open the extracted folder called "unique-web".
-   You should see index.html, a folder called "assets", and this file.
+STEP 2 - Open the folder
+  Open the new folder called "unique-web".
+  You should see: index.html, a folder called "assets", and this file.
 
-3. Double-click index.html.
-   It should open in your web browser (Chrome, Edge, or Firefox) and show the
-   black hero page with "[Your Full Name]" and the gold "View selected work" button.
+STEP 3 - Open the website
+  Double-click index.html.
+  It should open in Chrome, Edge, or Firefox and show a black opening page
+  with "[Your Full Name]" and the gold "View selected work" button.
+  Scroll down to see all eight phases, each with its own wallpaper.
 
-If you see plain text instead of the designed page (for example "Menu", "Close",
-or a line like "[Skip to content](https://...)"), the file is being shown as text.
-Do not open it in Notepad, a text viewer, or a markdown preview. Use the steps
-above and open it with your web browser.
+IF DOUBLE-CLICKING DOES NOT WORK (optional fallback)
+  1. Install Python from python.org (tick "Add python.exe to PATH" during setup).
+  2. In the unique-web folder, click the address bar at the top of File Explorer,
+     type  cmd  and press Enter.
+  3. Type  py -m http.server 8000  and press Enter. Leave this window open.
+  4. Open your browser and go to:  http://localhost:8000
+  5. To stop the server later, click the window and press Ctrl + C.
 
-Your wallpapers are in the folder assets\wallpapers and are named phase-1.jpg to
-phase-8.jpg.
+WHAT RAW TEXT MEANS
+  If you see plain words such as "Menu", "Close", or a line like
+  "[Skip to content](https://...)", the file is being shown as text, not as a
+  web page. This happens in text viewers, markdown previews, and some file
+  preview panes. Fix it by following Steps 1 to 3 and opening index.html with
+  your web browser.
 
-To edit your text, open assets\js\content.js in Notepad. See README.md for more.
+Your wallpapers are in the folder assets\wallpapers and are named
+phase-1.jpg to phase-8.jpg.
+
+To change your text, open assets\js\content.js in Notepad. README.md has more.
