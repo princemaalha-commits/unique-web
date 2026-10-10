@@ -115,6 +115,7 @@ window.SITE_CONTENT = {
       intro: "Areas I am learning and practising.",
       terminal: {
         title: "Interactive terminal",
+        examples: ["help", "about", "projects", "focus"],
         intro: "A small command line about me. Click the box below and type help.",
         prompt: "guest@portfolio:~$",
         sampleC: [
@@ -127,11 +128,11 @@ window.SITE_CONTENT = {
         ]
       },
       groups: [
-        { title: "Programming", items: ["C Programming"] },
-        { title: "Web Development", items: ["HTML", "CSS", "JavaScript"] },
-        { title: "Databases", items: ["SQL"] },
-        { title: "Technical Knowledge", items: ["Computer Hardware"] },
-        { title: "Professional Skills", items: ["Communication", "Customer Handling"] }
+        { title: "Programming", items: ["C Programming"], relates: "Programming" },
+        { title: "Web Development", items: ["HTML", "CSS", "JavaScript"], relates: "Web Development" },
+        { title: "Databases", items: ["SQL"], relates: "Databases" },
+        { title: "Technical Knowledge", items: ["Computer Hardware"], relates: "" },
+        { title: "Professional Skills", items: ["Communication", "Customer Handling"], relates: "" }
       ],
       wallpaper: "assets/wallpapers/phase-5.jpg",
       focus: "70% 50%", tone: "dark", accent: "#37e6ff",
@@ -141,6 +142,12 @@ window.SITE_CONTENT = {
       id: 6, type: "work", name: "Selected Projects",
       heading: "Selected Projects",
       intro: "Projects and practice work. Live links will be added when they are ready.",
+      filters: [
+        { label: "All", match: "" },
+        { label: "Web Development", match: "Web Development" },
+        { label: "Programming", match: "Programming" },
+        { label: "Databases", match: "Databases" }
+      ],
       projects: [
         {
           title: "8-Phase Cinematic Portfolio Website",
@@ -156,8 +163,8 @@ window.SITE_CONTENT = {
         },
         {
           title: "SQL Student Database Practice",
-          category: "Database Learning Project",
-          status: "",
+          category: "Databases",
+          status: "Learning Project",
           summary: "Practice with student records, SQL table creation, inserting data, and queries.",
           link: "",
           repo: "",
@@ -170,12 +177,79 @@ window.SITE_CONTENT = {
         },
         {
           title: "C Programming Practice Programs",
-          category: "Programming Learning Project",
-          status: "",
+          category: "Programming",
+          status: "Learning Project",
           summary: "Practice programs created while learning C programming.",
           link: "",
           repo: "",
-          details: []
+          details: [
+            "Simple sample programs written while learning C.",
+            "These are teaching examples, not completed professional software."
+          ],
+          examples: [
+            {
+              title: "Hello, World!",
+              note: "Prints one line of text.",
+              code: [
+                "#include <stdio.h>",
+                "",
+                "int main(void) {",
+                "    printf(\"Hello, World!\\n\");",
+                "    return 0;",
+                "}"
+              ],
+              output: ["Hello, World!"]
+            },
+            {
+              title: "Add two numbers",
+              note: "Stores two numbers in variables and prints their sum.",
+              code: [
+                "#include <stdio.h>",
+                "",
+                "int main(void) {",
+                "    int a = 5;",
+                "    int b = 7;",
+                "    int sum = a + b;",
+                "    printf(\"Sum = %d\\n\", sum);",
+                "    return 0;",
+                "}"
+              ],
+              output: ["Sum = 12"]
+            },
+            {
+              title: "Count from 1 to 5",
+              note: "A for loop repeats a block of code.",
+              code: [
+                "#include <stdio.h>",
+                "",
+                "int main(void) {",
+                "    for (int i = 1; i <= 5; i++) {",
+                "        printf(\"%d\\n\", i);",
+                "    }",
+                "    return 0;",
+                "}"
+              ],
+              output: ["1", "2", "3", "4", "5"]
+            },
+            {
+              title: "Even or odd",
+              note: "An if/else decides which message to print.",
+              code: [
+                "#include <stdio.h>",
+                "",
+                "int main(void) {",
+                "    int number = 8;",
+                "    if (number % 2 == 0) {",
+                "        printf(\"%d is even\\n\", number);",
+                "    } else {",
+                "        printf(\"%d is odd\\n\", number);",
+                "    }",
+                "    return 0;",
+                "}"
+              ],
+              output: ["8 is even"]
+            }
+          ]
         }
       ],
       sqlDemo: {
@@ -249,6 +323,12 @@ window.SITE_CONTENT = {
       fallback: ["#0b0c0f", "#4a5058"]
     }
   ],
+
+  /* ---------- Résumé (opens as a printable panel from the header and contact section) ---------- */
+  resume: {
+    title: "Résumé",
+    intro: "A summary built from the information above. Use the Print button and choose \"Save as PDF\" if you want a PDF copy."
+  },
 
   /* ---------- Finale (contact). Reuses the Phase 1 wallpaper to bookend the site.
      To use a different image, change "wallpaper" below. ---------- */
