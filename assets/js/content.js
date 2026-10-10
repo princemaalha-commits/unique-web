@@ -1,143 +1,175 @@
 /* =====================================================================
    YOUR CONTENT — the only file you need to edit day to day.
 
-   - Replace every text in [square brackets] with your own details.
-     Placeholders are intentionally generic. Nothing here is a real claim.
-   - Wallpapers: put each image in assets/wallpapers/ using the exact
-     file name shown (phase-1.jpg … phase-8.jpg). Until a file exists,
-     that phase shows its colour gradient instead.
+   - Text inside [square brackets] is a placeholder that still needs
+     your confirmation. Replace it when you have the real information.
+   - Links that are not ready (for example "[ADD GITHUB PROFILE URL]")
+     are shown as "link to be added" and are not clickable.
+   - Wallpapers: assets/wallpapers/phase-1.jpg … phase-8.jpg
+   - Photo: put your photo at assets/profile/photo.jpg. Until then a
+     "photo to be added" box is shown.
+   - CV: leave cvUrl empty to hide the CV button. Add a path such as
+     "assets/cv.pdf" once you have a PDF.
    - Keep the text inside the quotation marks. Do not delete commas.
-   - Colours use HEX codes, e.g. "#d9b77a".
    ===================================================================== */
 window.SITE_CONTENT = {
 
   /* ---------- Your details ---------- */
   owner: {
-    name: "[Your Full Name]",
-    initials: "[YF]",                      // short logo text, e.g. "AB"
-    role: "[Your title, e.g. Designer & Developer]",
-    tagline: "[One sentence about what you do and who you help.]",
-    location: "[City, Country]",
-    email: "you@example.com",
-    phone: "[+00 00000 00000]",
-    cvUrl: "",                             // e.g. "assets/cv.pdf" — leave "" to hide the button
+    name: "Prince Mallah",
+    initials: "PM",
+    role: "FYBCA Student | Aspiring Developer",
+    tagline: "Exploring programming, building practical projects, and turning curiosity into working solutions.",
+    location: "Surat, Gujarat, India",
+    email: "princemaalha@gmail.com",
+    phone: "[CONFIRM PHONE BEFORE PUBLISHING]",
+    photo: "assets/profile/photo.jpg",
+    cvUrl: "",
     social: [
-      { label: "LinkedIn", url: "https://www.linkedin.com/" },
-      { label: "GitHub", url: "https://github.com/" },
-      { label: "Instagram", url: "https://www.instagram.com/" }
+      { label: "GitHub", url: "[ADD GITHUB PROFILE URL]" },
+      { label: "LinkedIn", url: "[ADD LINKEDIN PROFILE URL]" }
     ]
   },
 
   /* ---------- The eight phases (top to bottom) ----------
      type:      hero | about | timeline | principles | skills | work | approach | focus
      tone:      "dark" (light text) or "light" (dark text on a bright wallpaper)
-     accent:    colour used for highlights in this phase
-     focus:     which part of the wallpaper stays visible on small screens,
-                e.g. "70% 50%" (left/right, top/bottom)
-     fallback:  two colours shown before the wallpaper loads or if it is missing
+     accent:    neon colour used for highlights in this phase
+     focus:     which part of the wallpaper stays visible on small screens
+     fallback:  two colours shown before the wallpaper loads
   --------------------------------------------------------- */
   phases: [
     {
       id: 1, type: "hero", name: "Opening",
       wallpaper: "assets/wallpapers/phase-1.jpg",
-      focus: "72% 50%", tone: "dark", accent: "#d9b77a",
+      focus: "72% 50%", tone: "dark", accent: "#37e6ff",
       fallback: ["#070706", "#3a2d1b"],
-      ctaPrimary: { label: "View selected work", target: "phase-6" },
-      ctaSecondary: { label: "Get in touch", target: "contact" }
+      ctaPrimary: { label: "Explore Projects", target: "phase-6" },
+      ctaSecondary: { label: "Get in Touch", target: "contact" }
     },
     {
-      id: 2, type: "about", name: "Origin",
-      heading: "Who I am",
-      intro: "[A two-sentence summary of your background, in your own voice.]",
+      id: 2, type: "about", name: "About Me",
+      heading: "About Me",
+      intro: "Curious about computers, programming, and practical technology.",
       paragraphs: [
-        "[First paragraph: where you started and what first drew you to your work.]",
-        "[Second paragraph: what you care about now and the kind of work you want to do next.]"
+        "I am a first-year BCA student interested in computers, programming, and practical technology. I enjoy understanding how things work and improving my skills by building projects.",
+        "My goal is to become a skilled developer and build useful software projects."
       ],
       facts: [
-        { label: "Based in", value: "[City, Country]" },
-        { label: "Working as", value: "[Your role]" },
-        { label: "Languages", value: "[English, …]" }
+        { label: "Education", value: "First-year BCA student" },
+        { label: "Languages", value: "Hindi, English, Gujarati" },
+        { label: "Based in", value: "Surat, Gujarat, India" },
+        { label: "Career goal", value: "Skilled developer building useful software" }
       ],
       wallpaper: "assets/wallpapers/phase-2.jpg",
-      focus: "70% 50%", tone: "dark", accent: "#6fdcff",
+      focus: "70% 50%", tone: "dark", accent: "#5ef2ff",
       fallback: ["#080b1c", "#2a1f5e"]
     },
     {
       id: 3, type: "timeline", name: "Journey",
-      heading: "The journey so far",
-      intro: "[A short line about how your path has developed.]",
+      heading: "My Journey",
+      intro: "My learning path and work experience so far.",
       items: [
-        { period: "[Year – Year]", title: "[Role or milestone]", org: "[Organisation]", text: "[What you did and what you learned.]" },
-        { period: "[Year – Year]", title: "[Role or milestone]", org: "[Organisation]", text: "[What you did and what you learned.]" },
-        { period: "[Year – Present]", title: "[Current role]", org: "[Organisation]", text: "[What you do today.]" }
+        {
+          period: "Approx. 8–9 months",
+          title: "Promoter",
+          org: "D-Mart",
+          text: "Customer interaction and clear communication with shoppers."
+        },
+        {
+          period: "Current",
+          title: "First-year BCA learning journey",
+          org: "[Add college name]",
+          text: "Learning C programming, SQL, HTML, CSS, and JavaScript through hands-on practice."
+        }
       ],
       wallpaper: "assets/wallpapers/phase-3.jpg",
-      focus: "50% 40%", tone: "light", accent: "#9c6b4f",
+      focus: "50% 40%", tone: "light", accent: "#5b3fd6",
       fallback: ["#a7b6c2", "#e6d3c0"]
     },
     {
       id: 4, type: "principles", name: "Mindset",
-      heading: "What guides my work",
-      intro: "[A line about the values behind your work.]",
+      heading: "What guides my learning",
+      intro: "The principles I try to follow as I learn and build.",
       items: [
-        { title: "[Principle one]", text: "[How this shows up in your work.]" },
-        { title: "[Principle two]", text: "[How this shows up in your work.]" },
-        { title: "[Principle three]", text: "[How this shows up in your work.]" }
+        { title: "Problem-solving", text: "Break a problem into manageable steps." },
+        { title: "Continuous learning", text: "Keep developing knowledge and skills." },
+        { title: "Practical experimentation", text: "Learn by building, testing, and improving." }
       ],
       wallpaper: "assets/wallpapers/phase-4.jpg",
-      focus: "70% 50%", tone: "dark", accent: "#bcd6ff",
+      focus: "70% 50%", tone: "dark", accent: "#a58bff",
       fallback: ["#05070f", "#2c3446"]
     },
     {
-      id: 5, type: "skills", name: "Capabilities",
-      heading: "Skills & tools",
-      intro: "[A short summary of what you are good at.]",
+      id: 5, type: "skills", name: "Skills",
+      heading: "Skills & Tools",
+      intro: "Areas I am learning and practising.",
       groups: [
-        { title: "[Category one]", items: ["[Skill]", "[Skill]", "[Skill]", "[Skill]"] },
-        { title: "[Category two]", items: ["[Skill]", "[Skill]", "[Skill]", "[Skill]"] },
-        { title: "[Category three]", items: ["[Skill]", "[Skill]", "[Skill]", "[Skill]"] }
+        { title: "Programming", items: ["C Programming"] },
+        { title: "Web Development", items: ["HTML", "CSS", "JavaScript"] },
+        { title: "Databases", items: ["SQL"] },
+        { title: "Technical Knowledge", items: ["Computer Hardware"] },
+        { title: "Professional Skills", items: ["Communication", "Customer Handling"] }
       ],
       wallpaper: "assets/wallpapers/phase-5.jpg",
-      focus: "70% 50%", tone: "dark", accent: "#5fe0e6",
+      focus: "70% 50%", tone: "dark", accent: "#37e6ff",
       fallback: ["#05101a", "#1b4455"]
     },
     {
-      id: 6, type: "work", name: "Work",
-      heading: "Selected work",
-      intro: "[One line describing the kind of projects shown here.]",
+      id: 6, type: "work", name: "Selected Projects",
+      heading: "Selected Projects",
+      intro: "Projects and practice work. Live links will be added when they are ready.",
       projects: [
-        { title: "[Project title]", category: "[Category]", year: "[Year]", summary: "[What it was, your role, and the outcome.]", link: "#" },
-        { title: "[Project title]", category: "[Category]", year: "[Year]", summary: "[What it was, your role, and the outcome.]", link: "#" },
-        { title: "[Project title]", category: "[Category]", year: "[Year]", summary: "[What it was, your role, and the outcome.]", link: "#" }
+        {
+          title: "8-Phase Portfolio",
+          category: "Web Development",
+          status: "In Progress",
+          summary: "An interactive portfolio combining custom wallpapers, cinematic visual storytelling, animations, and responsive design.",
+          link: ""
+        },
+        {
+          title: "SQL Student Database Practice",
+          category: "Database",
+          status: "Learning project",
+          summary: "Practice with student records, SQL table creation, inserting data, and queries.",
+          link: ""
+        },
+        {
+          title: "C Programming Practice Programs",
+          category: "Programming",
+          status: "Learning project",
+          summary: "Practice programs created while learning C programming.",
+          link: ""
+        }
       ],
       wallpaper: "assets/wallpapers/phase-6.jpg",
-      focus: "65% 50%", tone: "dark", accent: "#e08a7a",
+      focus: "65% 50%", tone: "dark", accent: "#b07bff",
       fallback: ["#150506", "#5c2427"]
     },
     {
-      id: 7, type: "approach", name: "Approach",
-      heading: "How I work",
-      intro: "[A short description of your process.]",
+      id: 7, type: "approach", name: "My Approach",
+      heading: "My Approach",
+      intro: "",
       steps: [
-        { title: "[Step one]", text: "[What happens in this step.]" },
-        { title: "[Step two]", text: "[What happens in this step.]" },
-        { title: "[Step three]", text: "[What happens in this step.]" },
-        { title: "[Step four]", text: "[What happens in this step.]" }
+        { title: "Understand the problem", text: "Clarify what needs solving before writing any code." },
+        { title: "Plan the solution", text: "Break the problem into smaller, manageable steps." },
+        { title: "Build and test", text: "Write code in small pieces and check each one." },
+        { title: "Improve through feedback", text: "Use results and feedback to make the next version better." }
       ],
       wallpaper: "assets/wallpapers/phase-7.jpg",
-      focus: "70% 50%", tone: "light", accent: "#9c7a52",
+      focus: "70% 50%", tone: "light", accent: "#5b3fd6",
       fallback: ["#e8dccb", "#c7b195"]
     },
     {
-      id: 8, type: "focus", name: "Now",
-      heading: "What I'm focusing on now",
+      id: 8, type: "focus", name: "Current Focus",
+      heading: "Current Focus",
       paragraphs: [
-        "[What you are working on or learning at the moment.]"
+        "Current learning focus: C programming, SQL, and web development."
       ],
-      items: ["[Current topic one]", "[Current topic two]", "[Current topic three]"],
-      openTo: "Open to: [collaborations, roles, commissions — edit this line]",
+      items: ["C programming", "SQL", "Web development"],
+      openTo: "Open to: Learning opportunities, beginner-friendly collaborations, and internships.",
       wallpaper: "assets/wallpapers/phase-8.jpg",
-      focus: "70% 50%", tone: "dark", accent: "#d5dde6",
+      focus: "70% 50%", tone: "dark", accent: "#37e6ff",
       fallback: ["#0b0c0f", "#4a5058"]
     }
   ],
@@ -148,10 +180,10 @@ window.SITE_CONTENT = {
     name: "Contact",
     ghost: "END",
     anchor: "contact",
-    heading: "Let's create something memorable.",
-    intro: "[Invite visitors to get in touch and say what you would like to talk about.]",
+    heading: "Let's Build Something Meaningful.",
+    intro: "I'm learning, experimenting, and working toward becoming a better developer.",
     wallpaper: "assets/wallpapers/phase-1.jpg",
-    focus: "50% 50%", tone: "dark", accent: "#d9b77a",
+    focus: "50% 50%", tone: "dark", accent: "#37e6ff",
     fallback: ["#070706", "#2a2116"]
   }
 };

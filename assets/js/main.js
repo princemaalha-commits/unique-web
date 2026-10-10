@@ -27,6 +27,12 @@
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
     }[ch]));
   const delay = (ms) => `style="--d:${ms}ms"`;
+  // A link is clickable only when it is a real web address or email address.
+  // Placeholders such as "[ADD GITHUB PROFILE URL]" are shown as "to be added".
+  const isLiveUrl = (u = "") => /^(https?:\/\/|mailto:)/.test(u);
+  const socialItem = (s) => isLiveUrl(s.url)
+    ? `<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label)}</a>`
+    : `<span class="social-pending" aria-disabled="true">${esc(s.label)} · link to be added</span>`;
   const owner = C.owner || {};
   const reduceQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const prefersReduced = () => reduceQuery.matches;
@@ -80,12 +86,22 @@
     },
 
     about(p) {
+      const photo = owner.photo
+        ? `<figure class="photo-frame" data-reveal ${delay(150)}>
+             <div class="photo-empty">
+               <span>Your photo goes here</span>
+               <small>Add the file: ${esc(owner.photo)}</small>
+             </div>
+             <img src="${esc(owner.photo)}" alt="Photo of ${esc(owner.name)}" loading="lazy" decoding="async" />
+           </figure>`
+        : "";
       return head(p) + `
-        <div class="about-grid">
+        <div class="about-grid${owner.photo ? " has-photo" : ""}">
+          ${photo}
           <div class="prose" data-reveal ${delay(200)}>
             ${p.paragraphs.map((t) => `<p>${esc(t)}</p>`).join("")}
           </div>
-          <div data-reveal ${delay(320)}>
+          <div class="about-facts" data-reveal ${delay(320)}>
             <dl class="facts glass">
               ${p.facts.map((f) => `<div><dt>${esc(f.label)}</dt><dd>${esc(f.value)}</dd></div>`).join("")}
             </dl>
@@ -141,10 +157,12 @@
           ${p.projects.map((pr, i) => `
             <div data-reveal ${delay(i * 140)}>
               <article class="glass project tilt">
-                <p class="tag">${esc(pr.category)} · ${esc(pr.year)}</p>
+                <p class="tag">${esc(pr.category)}${pr.year ? ` · ${esc(pr.year)}` : ""}${pr.status ? ` · <span class="status">${esc(pr.status)}</span>` : ""}</p>
                 <h3>${esc(pr.title)}</h3>
                 <p>${esc(pr.summary)}</p>
-                <a class="project-link" href="${esc(pr.link || "#")}">View project</a>
+                ${isLiveUrl(pr.link) && pr.link.startsWith("http")
+                  ? `<a class="project-link" href="${esc(pr.link)}" target="_blank" rel="noopener noreferrer">View project</a>`
+                  : `<span class="project-link is-disabled" aria-disabled="true">Live link not available yet</span>`}
               </article>
             </div>`).join("")}
         </div>`;
@@ -157,7 +175,7 @@
             <li data-reveal ${delay(i * 140)}>
               <span class="step-num">${esc(s.step || pad(i + 1))}</span>
               <h3>${esc(s.title)}</h3>
-              <p>${esc(s.text)}</p>
+              ${s.text ? `<p>${esc(s.text)}</p>` : ""}
             </li>`).join("")}
         </ol>`;
     },
@@ -191,10 +209,9 @@
             </a>` : ""}
           </div>
           <ul class="social" data-reveal ${delay(440)}>
-            ${(owner.social || []).map((s) => `
-              <li><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label)}</a></li>`).join("")}
+            ${(owner.social || []).map((s) => `<li>${socialItem(s)}</li>`).join("")}
           </ul>
-          <p class="contact-line" data-reveal ${delay(520)}>${esc(owner.phone)} · ${esc(owner.location)}</p>
+          <p class="contact-line" data-reveal ${delay(520)}>${esc(owner.email)} · ${esc(owner.phone)} · ${esc(owner.location)}</p>
           <footer class="site-footer">
             <p>© <span id="year"></span> ${esc(owner.name)}</p>
             <a href="#phase-1">Back to top ↑</a>
@@ -513,6 +530,12 @@
 
     const yearEl = $("#year");
     if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    // Show the profile photo only once the file really loads; otherwise keep the placeholder box
+    $$(".photo-frame img", appEl).forEach((img) => {
+      img.addEventListener("load", () => img.classList.add("is-loaded"));
+      img.addEventListener("error", () => img.remove());
+    });
 
     // Load the first image right away
     loadAround(0);
