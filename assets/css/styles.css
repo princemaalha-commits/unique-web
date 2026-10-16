@@ -1518,3 +1518,316 @@ html[data-phase-type="finale"] .hud { opacity: 0; }
   .phase-scan { display: none; }
   .project-open::after { transition: none; }
 }
+
+/* =====================================================================
+   FEATURES (round 3): terminal controls, skills explorer, filters,
+   code examples, résumé panel, print styles
+   ===================================================================== */
+
+/* The HTML hidden attribute must always hide (other rules set display) */
+[hidden] { display: none !important; }
+
+.resume-btn { margin-right: 10px; }
+
+/* Terminal: minimize / close controls and example chips */
+.term-bar { flex-wrap: wrap; }
+.term-bar .term-title { flex: 1 1 auto; }
+.term-ctls { display: flex; gap: 8px; margin-left: auto; }
+.term-ctl {
+  min-height: 36px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: transparent;
+  color: var(--fg);
+  font: 500 0.7rem var(--font-body);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.term-ctl:hover { border-color: var(--accent); color: var(--accent); }
+.term-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px 0;
+}
+.term-chips-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 4px;
+}
+.term-chip {
+  min-height: 36px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--violet) 55%, transparent);
+  background: rgba(165, 139, 255, 0.08);
+  color: #d9ccff;
+  font: 0.82rem ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+  cursor: pointer;
+}
+.term-chip:hover { background: rgba(165, 139, 255, 0.2); }
+.term-reopen {
+  margin-top: 14px;
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--fg);
+  font: inherit;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.term-reopen:hover { border-color: var(--accent); color: var(--accent); }
+
+/* Skills explorer */
+.skills-explorer { max-width: 980px; }
+.skill-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.skill-tab {
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--panel-edge);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font: 500 0.78rem var(--font-body);
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s, background 0.3s, box-shadow 0.4s;
+}
+.skill-tab:hover { color: var(--fg); border-color: color-mix(in srgb, var(--accent) 50%, transparent); }
+.skill-tab[aria-selected="true"] {
+  color: #06080d;
+  background: var(--accent);
+  border-color: transparent;
+  box-shadow: 0 0 22px -8px var(--accent);
+}
+.skill-panel {
+  min-height: 180px;
+  padding: clamp(22px, 3vw, 30px);
+}
+.skill-panel h3 {
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: var(--fg);
+}
+.skill-panel h4 {
+  margin: 22px 0 10px;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--violet);
+  font-weight: 500;
+}
+.related { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.related li { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; }
+.related .project-open { font-size: 0.82rem; }
+.related-status { font-size: 0.78rem; color: var(--muted); }
+
+/* Project filters */
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 14px;
+}
+.filter-btn {
+  min-height: 44px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid var(--panel-edge);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--muted);
+  font: 500 0.78rem var(--font-body);
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: color 0.3s, border-color 0.3s, background 0.3s;
+}
+.filter-btn:hover { color: var(--fg); border-color: color-mix(in srgb, var(--violet) 60%, transparent); }
+.filter-btn[aria-pressed="true"] {
+  color: #06080d;
+  background: var(--violet);
+  border-color: transparent;
+  box-shadow: 0 0 22px -8px var(--violet);
+}
+.filter-count { font-size: 0.82rem; color: var(--muted); margin: 0 0 18px; min-height: 1.2em; }
+.filter-empty {
+  margin-top: 8px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  border: 1px dashed var(--line);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+/* Code examples (C) */
+.code-example { margin: 18px 0 0; }
+.code-example figcaption { font-size: 0.92rem; color: rgba(245, 240, 232, 0.86); margin-bottom: 8px; }
+.code-example figcaption strong { color: var(--fg); font-weight: 600; }
+.code, .code-out {
+  margin: 0;
+  padding: 14px 16px;
+  border-radius: 12px;
+  overflow-x: auto;
+  background: rgba(3, 6, 10, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font: 0.84rem/1.6 ui-monospace, "Cascadia Mono", Consolas, "Courier New", monospace;
+  color: #e6f7ff;
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
+}
+.code-out { margin-top: 6px; color: #b9f5c9; }
+.code-out-label {
+  margin: 10px 0 0;
+  font-size: 0.66rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.tk-kw { color: #b89cff; }
+.tk-fn { color: #9ef0ff; }
+.tk-str { color: #ffd38a; }
+.tk-com { color: #7c8794; font-style: italic; }
+.tk-num { color: #ff9ad5; }
+.tk-pre { color: #ff9ad5; }
+
+.copy-status { margin-top: 10px; min-height: 1.4em; font-size: 0.88rem; color: var(--muted); }
+
+/* Résumé panel */
+.resume-dialog {
+  width: min(820px, calc(100vw - 24px));
+  max-height: 90vh;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  border-radius: 20px;
+  background: rgba(8, 9, 12, 0.97);
+  color: #f5f0e8;
+  box-shadow: 0 0 60px -18px color-mix(in srgb, var(--accent) 55%, transparent);
+  overflow: auto;
+}
+.resume-dialog::backdrop { background: rgba(0, 0, 0, 0.72); }
+.resume-inner { padding: clamp(20px, 4vw, 36px); }
+.resume-bar { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin-bottom: 18px; }
+.resume-bar button {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: #f5f0e8;
+  font: inherit;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.resume-bar .resume-print { border-color: transparent; background: var(--accent); color: #06080d; }
+.resume-bar button:hover { border-color: var(--accent); color: var(--accent); }
+.resume-bar .resume-print:hover { color: #06080d; }
+.resume-head {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.resume-photo { width: 150px; margin: 0; }
+.resume-name {
+  margin: 0 0 4px;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 1.05;
+}
+.resume-role { color: var(--accent); letter-spacing: 0.06em; margin: 0 0 10px; }
+.resume-meta { color: rgba(245, 240, 232, 0.8); font-size: 0.92rem; margin: 2px 0; }
+.resume-meta a { color: var(--accent); }
+.resume-id .resume-cv { margin-top: 12px; }
+.resume-sec { padding: 18px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
+.resume-sec:last-child { border-bottom: 0; }
+.resume-sec h3 {
+  margin: 0 0 10px;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--violet);
+  font-weight: 500;
+}
+.resume-sec p { margin: 0 0 10px; color: rgba(245, 240, 232, 0.88); line-height: 1.6; }
+.resume-dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 0; }
+.resume-dl dt { font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.resume-dl dd { margin: 4px 0 0; color: var(--fg); }
+.resume-items { margin: 0; padding-left: 18px; color: rgba(245, 240, 232, 0.88); line-height: 1.6; }
+.resume-items li { margin: 0 0 10px; }
+.resume-items strong { color: var(--fg); font-weight: 600; }
+.resume-period { display: block; font-size: 0.8rem; color: var(--muted); margin: 2px 0; }
+
+/* Phones: lighter visuals */
+@media (max-width: 760px) {
+  .grain { display: none; }
+  .resume-head { grid-template-columns: 1fr; }
+  .resume-photo { width: 130px; }
+  .resume-dl { grid-template-columns: 1fr; }
+    .resume-btn { padding-left: 14px; padding-right: 14px; }
+}
+/* Narrow phones: keep the PM monogram, Résumé and Menu visible. The name stays
+   available to screen readers but is visually hidden so the header does not collide. */
+@media (max-width: 480px) {
+  .brand-name {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap; max-width: none;
+  }
+  .brand { flex: none; }
+  .site-header .menu-btn { padding-left: 12px; padding-right: 12px; }
+}
+
+/* Printing the résumé: only the résumé is printed, in black on white */
+@media print {
+  @page { margin: 14mm; }
+  body > *:not(.resume-dialog) { display: none !important; }
+  .resume-dialog {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    overflow: visible !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+  .resume-dialog * { color: #111111 !important; background: transparent !important; box-shadow: none !important; text-shadow: none !important; }
+  .resume-dialog a { text-decoration: underline; }
+  .resume-dialog .no-print { display: none !important; }
+  .resume-dialog .resume-photo { display: none !important; }
+  .resume-sec { break-inside: avoid; border-color: #cccccc !important; }
+  .resume-head { border-color: #cccccc !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skill-tab, .filter-btn, .term-ctl, .term-chip { transition: none; }
+}
+
+/* All skills listed at once (the tabs below show each group in detail) */
+.skills-all { margin: 0 0 28px; }
+.skills-all-label {
+  font-size: 0.72rem; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); margin: 0 0 12px;
+}
+.skills-all-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px; }

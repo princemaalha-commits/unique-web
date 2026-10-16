@@ -61,20 +61,33 @@
   /* ---------- Feature builders: terminal, SQL demo ---------- */
   function renderTerminal(t) {
     return `
-      <section class="terminal glass" data-reveal ${delay(160)} aria-labelledby="term-title">
-        <header class="term-bar">
-          <span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span>
-          <h3 id="term-title" class="term-title">${esc(t.title)}</h3>
-        </header>
-        <p class="term-intro" id="term-help">${esc(t.intro)}</p>
-        <div class="term-out" id="termOut" role="log" aria-live="polite" aria-label="Terminal output" tabindex="0"></div>
-        <form class="term-form" id="termForm" autocomplete="off">
-          <label class="term-prompt" for="termIn">${esc(t.prompt)}</label>
-          <input id="termIn" class="term-input" type="text" name="command"
-                 autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
-                 aria-describedby="term-help" />
-        </form>
-      </section>`;
+      <div class="term-wrap" data-reveal ${delay(160)}>
+        <section class="terminal glass" id="terminal" aria-labelledby="term-title">
+          <header class="term-bar">
+            <span class="term-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <h3 id="term-title" class="term-title">${esc(t.title)}</h3>
+            <div class="term-ctls">
+              <button type="button" class="term-ctl" id="termMin" aria-expanded="true" aria-controls="termBody">Minimize</button>
+              <button type="button" class="term-ctl" id="termClose">Close</button>
+            </div>
+          </header>
+          <div class="term-body" id="termBody">
+            <p class="term-intro" id="term-help">${esc(t.intro)}</p>
+            <div class="term-chips" role="group" aria-label="Example commands">
+              <span class="term-chips-label" aria-hidden="true">Try</span>
+              ${(t.examples || []).map((c) => `<button type="button" class="term-chip" data-cmd="${esc(c)}">${esc(c)}</button>`).join("")}
+            </div>
+            <div class="term-out" id="termOut" role="log" aria-live="polite" aria-label="Terminal output" tabindex="0"></div>
+            <form class="term-form" id="termForm" autocomplete="off">
+              <label class="term-prompt" for="termIn">${esc(t.prompt)}</label>
+              <input id="termIn" class="term-input" type="text" name="command"
+                     autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"
+                     aria-describedby="term-help" />
+            </form>
+          </div>
+        </section>
+        <button type="button" class="term-reopen" id="termReopen" hidden>Open the terminal</button>
+      </div>`;
   }
 
   function renderSqlDemo(d) {
@@ -176,26 +189,34 @@
     },
 
     skills(p) {
+      const allSkills = p.groups.flatMap((g) => g.items);
       return head(p) + `
-        <div class="grid">
-          ${p.groups.map((g, i) => `
-            <div data-reveal ${delay(i * 120)}>
-              <article class="glass">
-                <h3>${esc(g.title)}</h3>
-                <div class="chips">
-                  ${g.items.map((s) => `<span class="chip">${esc(s)}</span>`).join("")}
-                </div>
-              </article>
-            </div>`).join("")}
+        <div class="skills-all" data-reveal ${delay(120)} aria-label="All skills">
+          <p class="skills-all-label">All skills</p>
+          <ul class="chips skills-all-list">${allSkills.map((s) => `<li class="chip">${esc(s)}</li>`).join("")}</ul>
+        </div>
+        <div class="skills-explorer" data-reveal ${delay(160)}>
+          <div class="skill-tabs" role="tablist" aria-label="Skill categories">
+            ${p.groups.map((g, i) => `<button type="button" role="tab" class="skill-tab" id="skill-tab-${i}"
+                aria-controls="skill-panel" aria-selected="${i === 0 ? "true" : "false"}"
+                tabindex="${i === 0 ? 0 : -1}" data-skill="${i}">${esc(g.title)}</button>`).join("")}
+          </div>
+          <div class="skill-panel glass" id="skill-panel" role="tabpanel" aria-labelledby="skill-tab-0" tabindex="0"></div>
         </div>
         ${p.terminal ? renderTerminal(p.terminal) : ""}`;
     },
 
     work(p) {
+      const filters = p.filters || [];
       return head(p) + `
+        ${filters.length ? `
+        <div class="filters" role="group" aria-label="Filter projects by category">
+          ${filters.map((f, i) => `<button type="button" class="filter-btn" data-filter="${i}" aria-pressed="${i === 0 ? "true" : "false"}">${esc(f.label)}</button>`).join("")}
+        </div>
+        <p class="filter-count" id="filterCount" aria-live="polite"></p>` : ""}
         <div class="grid">
           ${p.projects.map((pr, i) => `
-            <div data-reveal ${delay(i * 140)}>
+            <div data-reveal ${delay(i * 140)} data-category="${esc(pr.category)}">
               <article class="glass project tilt">
                 <p class="tag">${esc(pr.category)}${pr.year ? ` · ${esc(pr.year)}` : ""}${pr.status ? ` · <span class="status">${esc(pr.status)}</span>` : ""}</p>
                 <h3>${esc(pr.title)}</h3>
@@ -210,6 +231,7 @@
               </article>
             </div>`).join("")}
         </div>
+        <p class="filter-empty" id="filterEmpty" hidden>No projects in this category yet. Projects will appear here when they are added.</p>
         ${p.sqlDemo ? renderSqlDemo(p.sqlDemo) : ""}`;
     },
 
@@ -248,15 +270,20 @@
             <a class="btn btn-solid magnetic" href="mailto:${esc(owner.email)}">
               <span>Email me</span><span class="arrow" aria-hidden="true">→</span>
             </a>
+            <button type="button" class="btn magnetic" id="copyEmail" data-email="${esc(owner.email)}"><span>Copy email</span></button>
+            <button type="button" class="btn magnetic" data-open-resume aria-haspopup="dialog">
+              <span>${esc((C.resume && C.resume.title) || "Résumé")}</span><span class="arrow" aria-hidden="true">↗</span>
+            </button>
             ${owner.cvUrl ? `
             <a class="btn magnetic" href="${esc(owner.cvUrl)}">
               <span>View CV</span><span class="arrow" aria-hidden="true">↓</span>
             </a>` : ""}
           </div>
+          <p class="copy-status" id="copyStatus" role="status"></p>
           <ul class="social" data-reveal ${delay(440)}>
             ${(owner.social || []).map((s) => `<li>${socialItem(s)}</li>`).join("")}
           </ul>
-          <p class="contact-line" data-reveal ${delay(520)}>${esc(owner.email)} · ${esc(owner.phone)} · ${esc(owner.location)}</p>
+          <p class="contact-line" data-reveal ${delay(520)}>${esc(owner.email)} · ${esc(owner.location)}</p>
           <footer class="site-footer">
             <p>© <span id="year"></span> ${esc(owner.name)}</p>
             <a href="#phase-1">Back to top ↑</a>
@@ -582,29 +609,40 @@
     const out = $("#termOut");
     const form = $("#termForm");
     const input = $("#termIn");
-    if (!cfg || !out || !form || !input) return;
+    const section = $("#terminal");
+    const termBody = $("#termBody");
+    const minBtn = $("#termMin");
+    const closeBtn = $("#termClose");
+    const reopen = $("#termReopen");
+    if (!cfg || !out || !form || !input || !section || !termBody) return;
 
     const aboutPhase = phases.find((p) => p.type === "about") || {};
     const skillsPhase = phases.find((p) => p.type === "skills") || {};
     const workPhase = phases.find((p) => p.type === "work") || {};
+    const focusPhase = phases.find((p) => p.type === "focus") || {};
     const facts = {};
     (aboutPhase.facts || []).forEach((f) => { facts[f.label.toLowerCase()] = f.value; });
     const fact = (label) => facts[label] || "Not added yet.";
 
-    const helpText = {
+    const coreHelp = {
+      help: "list the commands",
       about: "who I am",
       skills: "what I am learning",
       projects: "my projects and their status",
+      focus: "what I am working on now",
+      contact: "how to reach me",
+      clear: "clear the screen"
+    };
+    const moreHelp = {
+      sql: "open the SQL demo",
+      c: "a sample C program",
       education: "my studies",
       languages: "languages I speak",
       goal: "what I am working toward",
       location: "where I am based",
-      contact: "how to reach me",
-      sql: "open the SQL demo",
-      c: "a sample C program",
-      whoami: "a short summary",
-      clear: "clear the screen"
+      whoami: "a short summary"
     };
+    const fmt = ([k, v]) => `  ${k.padEnd(10)} ${v}`;
 
     const print = (text, cls = "") => {
       const line = document.createElement("div");
@@ -632,27 +670,36 @@
       return ["Opening the SQL demo in Selected Projects."];
     };
 
-    // Each command returns a list of text lines. Text is added with textContent, never as HTML.
+    // Every answer is built from content.js and added as plain text (never as HTML).
+    // Only the listed commands run; anything else gets a "not found" message.
     const commands = {
       help: () => [
-        "Available commands:",
-        ...Object.entries(helpText).map(([k, v]) => `  ${k.padEnd(10)} ${v}`),
+        "Core commands:",
+        ...Object.entries(coreHelp).map(fmt),
         "",
-        "Use the up and down arrow keys to see earlier commands."
+        "More commands:",
+        ...Object.entries(moreHelp).map(fmt),
+        "",
+        "Use the up and down arrow keys for earlier commands. Click a chip to run it."
       ],
       about: () => [owner.tagline || "", "", ...(aboutPhase.paragraphs || [])],
       skills: () => (skillsPhase.groups || []).map((g) => `${g.title}: ${g.items.join(", ")}`),
       projects: () => (workPhase.projects || []).map((pr) =>
         `- ${pr.title} (${pr.category}${pr.status ? `, ${pr.status}` : ""})`),
+      focus: () => [
+        ...(focusPhase.paragraphs || []),
+        ...(focusPhase.items || []).map((i) => `- ${i}`),
+        focusPhase.openTo || ""
+      ].filter((l) => l !== ""),
+      contact: () => [
+        `Email: ${owner.email || "not added yet"}`,
+        `Location: ${owner.location || "not added yet"}`,
+        ...(owner.social || []).map((s) => `${s.label}: ${isLiveUrl(s.url) ? s.url : "link to be added"}`)
+      ],
       education: () => [fact("education")],
       languages: () => [fact("languages")],
       goal: () => [fact("career goal")],
       location: () => [owner.location || "Not added yet."],
-      contact: () => [
-        `Email: ${owner.email || "not added yet"}`,
-        `Phone: ${owner.phone || "not added yet"}`,
-        ...(owner.social || []).map((s) => `${s.label}: ${isLiveUrl(s.url) ? s.url : "link to be added"}`)
-      ],
       whoami: () => [`${owner.name} — ${owner.role}`],
       sql: openSql,
       c: () => [...cfg.sampleC, "", "(A general example. It is not one of my projects.)"]
@@ -670,7 +717,7 @@
       } else if (commands[cmd]) {
         printLines(commands[cmd]());
       } else {
-        print(`Command not found: ${cmd}. Type help to see the list.`, "term-err");
+        print(`Command not found: ${cmd}. Type help to see the list of commands.`, "term-err");
       }
       out.scrollTop = out.scrollHeight;
     };
@@ -699,9 +746,38 @@
       input.value = "";
     });
 
+    // Example chips run a predefined command and return focus to the input
+    $$(".term-chip", section).forEach((chip) => {
+      chip.addEventListener("click", () => {
+        run(chip.dataset.cmd);
+        input.focus();
+      });
+    });
+
+    // Minimize collapses the body but keeps the title bar; Close hides the terminal
+    minBtn.addEventListener("click", () => {
+      const collapse = !termBody.hidden;
+      termBody.hidden = collapse;
+      minBtn.textContent = collapse ? "Expand" : "Minimize";
+      minBtn.setAttribute("aria-expanded", String(!collapse));
+    });
+    closeBtn.addEventListener("click", () => {
+      section.hidden = true;
+      reopen.hidden = false;
+      reopen.focus();
+    });
+    reopen.addEventListener("click", () => {
+      section.hidden = false;
+      reopen.hidden = true;
+      termBody.hidden = false;
+      minBtn.textContent = "Minimize";
+      minBtn.setAttribute("aria-expanded", "true");
+      input.focus();
+    });
+
     printLines([
       "Welcome. This is a small command line about me.",
-      "Type help to see what you can ask."
+      "Type help to see what you can ask, or click a chip below."
     ]);
   }
 
@@ -843,18 +919,72 @@
     });
   }
 
-  /* ---------- Project details dialog ---------- */
+  /* ---------- Lightweight C syntax highlighting (no library) ---------- */
+  const C_KEYWORDS = new Set([
+    "auto", "break", "case", "char", "const", "continue", "default", "do", "double", "else",
+    "enum", "extern", "float", "for", "goto", "if", "int", "long", "register", "return",
+    "short", "signed", "sizeof", "static", "struct", "switch", "typedef", "union", "unsigned",
+    "void", "volatile", "while"
+  ]);
+
+  // Returns HTML. Every piece of source text is escaped before it is wrapped in a span.
+  function highlightC(src) {
+    const re = /(\/\*[\s\S]*?\*\/|\/\/[^\n]*)|("(?:\\.|[^"\\\n])*")|('(?:\\.|[^'\\\n])*')|(^[ \t]*#[^\n]*)|(\b\d+(?:\.\d+)?\b)|(\b[A-Za-z_]\w*\b)(?=\s*\()|(\b[A-Za-z_]\w*\b)/gm;
+    let html = "";
+    let last = 0;
+    let m;
+    while ((m = re.exec(src)) !== null) {
+      const tok = m[0];
+      html += esc(src.slice(last, m.index));
+      let cls = null;
+      if (m[1]) cls = "tk-com";
+      else if (m[2] || m[3]) cls = "tk-str";
+      else if (m[4]) cls = "tk-pre";
+      else if (m[5]) cls = "tk-num";
+      else if (m[6]) cls = C_KEYWORDS.has(tok) ? "tk-kw" : "tk-fn";
+      else if (m[7]) cls = C_KEYWORDS.has(tok) ? "tk-kw" : null;
+      html += cls ? `<span class="${cls}">${esc(tok)}</span>` : esc(tok);
+      last = m.index + tok.length;
+    }
+    return html + esc(src.slice(last));
+  }
+
+  /* ---------- Dialog helpers (shared by project details and the résumé) ---------- */
+  function openDialog(dlg, opener, focusEl) {
+    dlg.__opener = opener;
+    if (typeof dlg.showModal === "function") dlg.showModal();
+    else dlg.setAttribute("open", "");
+    if (focusEl) focusEl.focus();
+  }
+  function closeDialog(dlg) {
+    if (typeof dlg.close === "function") dlg.close();
+    else dlg.removeAttribute("open");
+  }
+  function wireDialog(dlg) {
+    // Clicking the dark backdrop, a Close button, or a link inside the dialog closes it
+    dlg.addEventListener("click", (e) => {
+      if (e.target === dlg || e.target.closest(".detail-close") || e.target.closest("a")) closeDialog(dlg);
+    });
+    // Escape closes natively; afterwards focus returns to the button that opened it
+    dlg.addEventListener("close", () => {
+      const o = dlg.__opener;
+      dlg.__opener = null;
+      if (o && document.body.contains(o)) o.focus();
+    });
+  }
+
+  /* ---------- Project details dialog (with C examples) ---------- */
   function setupDetails() {
     const projects = (phases.find((p) => p.type === "work") || {}).projects || [];
     const dlg = document.createElement("dialog");
     dlg.className = "detail-dialog";
     dlg.setAttribute("aria-labelledby", "detail-title");
     body.appendChild(dlg);
+    wireDialog(dlg);
 
-    let opener = null;
     const liveHttp = (u) => isLiveUrl(u) && /^https?:\/\//.test(u);
 
-    function fill(pr) {
+    function detailHTML(pr) {
       const details = (pr.details || []).length
         ? `<ul class="detail-list">${pr.details.map((d) => `<li>${esc(d)}</li>`).join("")}</ul>`
         : `<p class="detail-empty">Details will be added when this project is ready.</p>`;
@@ -868,7 +998,17 @@
       const demo = pr.demo
         ? `<a class="detail-link" href="#${esc(pr.demo)}">${esc(pr.demoLabel || "Open the demo")} ↓</a>`
         : "";
-      dlg.innerHTML = `
+      const examples = (pr.examples || []).length
+        ? `<h4>Examples</h4>
+           <p class="detail-help">Simple teaching examples. They are not completed professional software.</p>
+           ${pr.examples.map((ex) => `
+             <figure class="code-example">
+               <figcaption><strong>${esc(ex.title)}</strong> — ${esc(ex.note)}</figcaption>
+               <pre class="code"><code>${highlightC((ex.code || []).join("\n"))}</code></pre>
+               ${(ex.output || []).length ? `<p class="code-out-label">Output</p><pre class="code-out"><code>${esc(ex.output.join("\n"))}</code></pre>` : ""}
+             </figure>`).join("")}`
+        : "";
+      return `
         <div class="detail-inner">
           <button type="button" class="detail-close">Close</button>
           <p class="tag">${esc(pr.category)}${pr.status ? ` · ${esc(pr.status)}` : ""}</p>
@@ -876,6 +1016,7 @@
           <p class="detail-summary">${esc(pr.summary)}</p>
           <h4>Details</h4>
           ${details}
+          ${examples}
           <h4>Work and links</h4>
           ${repo}
           ${live}
@@ -883,32 +1024,227 @@
         </div>`;
     }
 
-    function closeDialog() {
-      if (typeof dlg.close === "function") dlg.close();
-      else dlg.removeAttribute("open");
-    }
-
     appEl.addEventListener("click", (e) => {
       const btn = e.target.closest(".project-open");
       if (!btn) return;
       const pr = projects[Number(btn.dataset.project)];
       if (!pr) return;
-      opener = btn;
-      fill(pr);
-      if (typeof dlg.showModal === "function") dlg.showModal();
-      else dlg.setAttribute("open", "");
-      const closeBtn = dlg.querySelector(".detail-close");
-      if (closeBtn) closeBtn.focus();
+      dlg.innerHTML = detailHTML(pr);
+      openDialog(dlg, btn, dlg.querySelector(".detail-close"));
     });
+  }
 
-    dlg.addEventListener("click", (e) => {
-      // A click on the dark backdrop (outside the panel) or the Close button closes the dialog
-      if (e.target === dlg || e.target.closest(".detail-close") || e.target.closest("a")) closeDialog();
+  /* ---------- Résumé panel (printable, built from the same content) ---------- */
+  function setupResume() {
+    const dlg = document.createElement("dialog");
+    dlg.className = "resume-dialog";
+    dlg.setAttribute("aria-labelledby", "resume-title");
+    body.appendChild(dlg);
+    wireDialog(dlg);
+
+    const find = (t) => phases.find((p) => p.type === t) || {};
+    const about = find("about");
+    const timeline = find("timeline");
+    const skills = find("skills");
+    const work = find("work");
+    const focusP = find("focus");
+    const facts = {};
+    (about.facts || []).forEach((f) => { facts[f.label] = f.value; });
+
+    const social = (owner.social || []).map((s) => isLiveUrl(s.url)
+      ? `<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label)}</a>`
+      : `<span>${esc(s.label)}: link to be added</span>`).join(" · ");
+
+    dlg.innerHTML = `
+      <div class="resume-inner">
+        <div class="resume-bar no-print">
+          <button type="button" class="resume-print">Print or save as PDF</button>
+          <button type="button" class="detail-close resume-close">Close</button>
+        </div>
+        <header class="resume-head">
+          <figure class="photo-frame resume-photo">
+            <div class="photo-empty"><span>Photo slot</span><small>Add: ${esc(owner.photo || "a photo")}</small></div>
+            ${owner.photo ? `<img src="${esc(owner.photo)}" alt="Photo of ${esc(owner.name)}" loading="lazy" decoding="async" />` : ""}
+          </figure>
+          <div class="resume-id">
+            <h2 id="resume-title" class="resume-name">${esc(owner.name)}</h2>
+            <p class="resume-role">${esc(owner.role)}</p>
+            <p class="resume-meta">${esc(owner.location)} · <a href="mailto:${esc(owner.email)}">${esc(owner.email)}</a></p>
+            <p class="resume-meta">${social}</p>
+            ${owner.cvUrl ? `<a class="btn btn-solid resume-cv" href="${esc(owner.cvUrl)}" download><span>Download CV (PDF)</span></a>` : ""}
+          </div>
+        </header>
+        <section class="resume-sec">
+          <h3>About</h3>
+          ${(about.paragraphs || []).map((t) => `<p>${esc(t)}</p>`).join("")}
+        </section>
+        <section class="resume-sec">
+          <h3>Education and languages</h3>
+          <dl class="resume-dl">
+            <div><dt>Education</dt><dd>${esc(facts["Education"] || "")}</dd></div>
+            <div><dt>Languages</dt><dd>${esc(facts["Languages"] || "")}</dd></div>
+            <div><dt>Based in</dt><dd>${esc(facts["Based in"] || "")}</dd></div>
+          </dl>
+        </section>
+        <section class="resume-sec">
+          <h3>Experience and learning</h3>
+          <ul class="resume-items">
+            ${(timeline.items || []).map((it) => `<li><strong>${esc(it.title)}</strong>${it.org ? ` — ${esc(it.org)}` : ""}<span class="resume-period">${esc(it.period)}</span>${esc(it.text)}</li>`).join("")}
+          </ul>
+        </section>
+        <section class="resume-sec">
+          <h3>Skills</h3>
+          <ul class="resume-items">
+            ${(skills.groups || []).map((g) => `<li><strong>${esc(g.title)}:</strong> ${esc(g.items.join(", "))}</li>`).join("")}
+          </ul>
+        </section>
+        <section class="resume-sec">
+          <h3>Projects</h3>
+          <ul class="resume-items">
+            ${(work.projects || []).map((pr) => `<li><strong>${esc(pr.title)}</strong> — ${esc(pr.category)}${pr.status ? `, ${esc(pr.status)}` : ""}<br>${esc(pr.summary)}</li>`).join("")}
+          </ul>
+        </section>
+        <section class="resume-sec">
+          <h3>Current focus and career interests</h3>
+          <ul class="resume-items">${(focusP.items || []).map((i) => `<li>${esc(i)}</li>`).join("")}</ul>
+          <p>${esc(focusP.openTo || "")}</p>
+          <p>${esc(facts["Career goal"] || "")}</p>
+        </section>
+      </div>`;
+
+    const img = $(".resume-photo img", dlg);
+    if (img) {
+      img.addEventListener("load", () => img.classList.add("is-loaded"));
+      img.addEventListener("error", () => img.remove());
+    }
+    $(".resume-print", dlg).addEventListener("click", () => window.print());
+
+    // Any element with data-open-resume (header button, contact button) opens the panel
+    document.addEventListener("click", (e) => {
+      const trigger = e.target.closest("[data-open-resume]");
+      if (!trigger) return;
+      openDialog(dlg, trigger, $(".resume-close", dlg));
     });
-    dlg.addEventListener("close", () => {
-      if (opener && document.body.contains(opener)) opener.focus();
-      opener = null;
+  }
+
+  /* ---------- Copy email (uses the clipboard if the browser allows it) ---------- */
+  async function copyText(text) {
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (err) { /* fall through to the older method */ }
+    }
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "-1000px";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+    ta.remove();
+    return ok;
+  }
+
+  function setupCopy() {
+    const btn = $("#copyEmail");
+    const status = $("#copyStatus");
+    if (!btn || !status) return;
+    btn.addEventListener("click", async () => {
+      const ok = await copyText(btn.dataset.email || "");
+      status.textContent = ok
+        ? "Email copied to your clipboard."
+        : "Could not copy automatically. Select the email address above and copy it.";
     });
+  }
+
+  /* ---------- Skills explorer (choose a category to see its skills and related projects) ---------- */
+  function setupSkills() {
+    const skillsPhase = phases.find((p) => p.type === "skills");
+    const tabs = $$(".skill-tab");
+    const panel = $("#skill-panel");
+    if (!skillsPhase || !skillsPhase.groups || !tabs.length || !panel) return;
+    const projects = (phases.find((p) => p.type === "work") || {}).projects || [];
+    const tabList = $(".skill-tabs");
+
+    function show(i, moveFocus = false) {
+      const g = skillsPhase.groups[i];
+      if (!g) return;
+      tabs.forEach((t, k) => {
+        const on = k === i;
+        t.setAttribute("aria-selected", String(on));
+        t.tabIndex = on ? 0 : -1;
+      });
+      panel.setAttribute("aria-labelledby", `skill-tab-${i}`);
+      const related = g.relates
+        ? projects.map((pr, idx) => ({ pr, idx })).filter((x) => x.pr.category === g.relates)
+        : [];
+      const relatedHtml = related.length
+        ? `<ul class="related">
+             ${related.map(({ pr, idx }) => `
+               <li>
+                 <button type="button" class="project-open" data-project="${idx}" aria-haspopup="dialog"
+                         aria-label="Project details: ${esc(pr.title)}">${esc(pr.title)}</button>
+                 ${pr.status ? `<span class="related-status">${esc(pr.status)}</span>` : ""}
+               </li>`).join("")}
+           </ul>`
+        : `<p class="detail-empty">${g.relates
+            ? "No project in this category yet."
+            : "No linked projects yet. Projects will be linked here when they are added."}</p>`;
+      panel.innerHTML = `
+        <h3>${esc(g.title)}</h3>
+        <div class="chips">${g.items.map((s) => `<span class="chip">${esc(s)}</span>`).join("")}</div>
+        <h4>Related projects</h4>
+        ${relatedHtml}`;
+      if (moveFocus) tabs[i].focus();
+    }
+
+    tabs.forEach((t, i) => t.addEventListener("click", () => show(i)));
+    tabList.addEventListener("keydown", (e) => {
+      const cur = tabs.indexOf(document.activeElement);
+      if (cur < 0) return;
+      let next = null;
+      if (e.key === "ArrowRight") next = (cur + 1) % tabs.length;
+      else if (e.key === "ArrowLeft") next = (cur - 1 + tabs.length) % tabs.length;
+      else if (e.key === "Home") next = 0;
+      else if (e.key === "End") next = tabs.length - 1;
+      if (next !== null) {
+        e.preventDefault();
+        show(next, true);
+      }
+    });
+    show(0);
+  }
+
+  /* ---------- Project filters with an empty state ---------- */
+  function setupFilters() {
+    const work = phases.find((p) => p.type === "work") || {};
+    const scope = $(".phase-work", appEl);
+    if (!scope || !work.filters || !work.filters.length) return;
+    const btns = $$(".filter-btn", scope);
+    const cards = $$("[data-category]", scope);
+    const count = $("#filterCount", scope);
+    const empty = $("#filterEmpty", scope);
+
+    function apply(i) {
+      const f = work.filters[i];
+      if (!f) return;
+      let shown = 0;
+      cards.forEach((c) => {
+        const visible = !f.match || c.dataset.category === f.match;
+        c.hidden = !visible;
+        if (visible) shown += 1;
+      });
+      btns.forEach((b, k) => b.setAttribute("aria-pressed", String(k === i)));
+      if (count) count.textContent = `Showing ${shown} of ${cards.length} project${cards.length === 1 ? "" : "s"}.`;
+      if (empty) empty.hidden = shown > 0;
+    }
+
+    btns.forEach((b) => b.addEventListener("click", () => apply(Number(b.dataset.filter))));
+    apply(0);
   }
 
   /* ---------- Start ---------- */
@@ -921,6 +1257,10 @@
     setupTerminal();
     setupSqlDemo();
     setupDetails();
+    setupResume();
+    setupCopy();
+    setupSkills();
+    setupFilters();
 
     const yearEl = $("#year");
     if (yearEl) yearEl.textContent = new Date().getFullYear();
